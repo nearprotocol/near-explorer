@@ -1,4 +1,5 @@
 const { DS_INDEXER_BACKEND, PARTNER_LIST } = require("./consts");
+const { nearPoolAccountSuffix } = require("./config");
 const models = require("../models");
 const BN = require("bn.js");
 
@@ -83,6 +84,18 @@ const pickOnlineValidatingNode = (nodes) => {
     return { accountId: node.account_id, ...node.nodeInfo };
   });
   return onlineValidatingNodes;
+};
+
+const queryNodeValidators = async () => {
+  return await queryRows(
+    [
+      `SELECT
+      account_id
+    FROM accounts
+    WHERE account_id LIKE '%${nearPoolAccountSuffix}'`,
+    ],
+    { dataSource: DS_INDEXER_BACKEND }
+  );
 };
 
 const queryOnlineNodes = async () => {
@@ -564,6 +577,7 @@ const getLastYesterdayBlock = async (timestamp) => {
 exports.queryOnlineNodes = queryOnlineNodes;
 exports.extendWithTelemetryInfo = extendWithTelemetryInfo;
 exports.pickOnlineValidatingNode = pickOnlineValidatingNode;
+exports.queryNodeValidators = queryNodeValidators;
 
 // genesis
 exports.getSyncedGenesis = getSyncedGenesis;

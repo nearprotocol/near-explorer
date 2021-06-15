@@ -45,7 +45,7 @@ class ValidatorsList extends React.PureComponent<Props> {
         new BN(b.stake).sub(new BN(a.stake))
       )
       .map((node: N.ValidationNodeInfo, index: number) => {
-        if (validatorType === "validators") {
+        if (validatorType === "validators" || validatorType === "nodePools") {
           return {
             ...node,
             totalStake: totalStake,
@@ -54,6 +54,8 @@ class ValidatorsList extends React.PureComponent<Props> {
         }
         return node;
       });
+
+    // console.log("validators", validators?.filter((i) => (i.num_produced_blocks && i.num_expected_blocks) || i.nodeInfo));
 
     return (
       <>

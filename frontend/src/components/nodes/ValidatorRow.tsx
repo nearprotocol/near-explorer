@@ -58,6 +58,7 @@ class ValidatorRow extends React.PureComponent<Props, State> {
     }
 
     if (
+      node.stake &&
       node.totalStake &&
       node?.cumulativeStakeAmount &&
       validatorType !== "proposals"
@@ -68,6 +69,8 @@ class ValidatorRow extends React.PureComponent<Props, State> {
           .div(node.totalStake)
           .toNumber() / 100;
     }
+
+    // console.log("node", node);
 
     return (
       <DatabaseConsumer>
@@ -101,41 +104,43 @@ class ValidatorRow extends React.PureComponent<Props, State> {
 
               <td>
                 <Row noGutters className="align-items-center">
-                  <Col xs="2" className="validators-node-label">
-                    {validatorType === "proposals" ? (
-                      <ValidatingLabel
-                        type="pending"
-                        text="node staked to be new validating one"
-                        tooltipKey="nodes"
-                      >
-                        Pending
-                      </ValidatingLabel>
-                    ) : node.new ? (
-                      <ValidatingLabel
-                        type="new"
-                        text="next epoch upcoming validating nodes"
-                        tooltipKey="new"
-                      >
-                        New
-                      </ValidatingLabel>
-                    ) : node.removed ? (
-                      <ValidatingLabel
-                        type="kickout"
-                        text="next epoch kick out nodes"
-                        tooltipKey="kickout"
-                      >
-                        Kickout
-                      </ValidatingLabel>
-                    ) : (
-                      <ValidatingLabel
-                        type="active"
-                        text="current validating nodes"
-                        tooltipKey="current"
-                      >
-                        Active
-                      </ValidatingLabel>
-                    )}
-                  </Col>
+                  {validatorType !== "nodePools" ? (
+                    <Col xs="2" className="validators-node-label">
+                      {validatorType === "proposals" ? (
+                        <ValidatingLabel
+                          type="pending"
+                          text="node staked to be new validating one"
+                          tooltipKey="nodes"
+                        >
+                          Pending
+                        </ValidatingLabel>
+                      ) : node.new ? (
+                        <ValidatingLabel
+                          type="new"
+                          text="next epoch upcoming validating nodes"
+                          tooltipKey="new"
+                        >
+                          New
+                        </ValidatingLabel>
+                      ) : node.removed ? (
+                        <ValidatingLabel
+                          type="kickout"
+                          text="next epoch kick out nodes"
+                          tooltipKey="kickout"
+                        >
+                          Kickout
+                        </ValidatingLabel>
+                      ) : (
+                        <ValidatingLabel
+                          type="active"
+                          text="current validating nodes"
+                          tooltipKey="current"
+                        >
+                          Active
+                        </ValidatingLabel>
+                      )}
+                    </Col>
+                  ) : null}
 
                   <Col className="validator-name">
                     <Row noGutters>

@@ -43,6 +43,8 @@ class Validators extends React.PureComponent<Props> {
             const validatorType =
               type === "validators"
                 ? context.currentValidators
+                : type === "nodePools"
+                ? context.currentPools
                 : context.currentProposals;
             return (
               <>
@@ -83,7 +85,7 @@ class Validators extends React.PureComponent<Props> {
                           activePage,
                           itemsPerPage,
                         }}
-                        cellCount={type === "validators" ? 7 : 6}
+                        cellCount={type === "proposals" ? 6 : 7}
                         validatorType={type}
                       />
                     </tbody>

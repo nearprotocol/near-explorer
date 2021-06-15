@@ -34,6 +34,7 @@ const {
   extendWithTelemetryInfo,
   queryOnlineNodes,
   pickOnlineValidatingNode,
+  queryNodeValidators,
   getSyncedGenesis,
   queryDashboardBlocksStats,
   queryDashboardTransactionsStats,
@@ -63,6 +64,7 @@ const { calculateCirculatingSupply } = require("./aggregations");
 let currentValidators = [];
 let currentProposals = [];
 let stakingPoolsInfo = new Map();
+let currentPools = [];
 
 async function startLegacySync() {
   console.log("Starting NEAR Explorer legacy syncing service...");
@@ -308,12 +310,17 @@ async function main() {
         );
         const onlineNodes = await queryOnlineNodes();
 
+        currentPools = await extendWithTelemetryInfo(
+          await queryNodeValidators()
+        );
+
         if (stakingPoolsInfo) {
           currentValidators.forEach((validator) => {
             const stakingPoolInfo = stakingPoolsInfo.get(validator.account_id);
             if (stakingPoolInfo) {
               validator.fee = stakingPoolInfo.fee;
               validator.delegatorsCount = stakingPoolInfo.delegatorsCount;
+              validator.stake = stakingPoolInfo.stake;
             }
           });
           currentProposals.forEach((validator) => {
@@ -321,6 +328,14 @@ async function main() {
             if (stakingPoolInfo) {
               validator.fee = stakingPoolInfo.fee;
               validator.delegatorsCount = stakingPoolInfo.delegatorsCount;
+            }
+          });
+          currentPools.forEach((validator) => {
+            const stakingPoolInfo = stakingPoolsInfo.get(validator.account_id);
+            if (stakingPoolInfo) {
+              validator.fee = stakingPoolInfo.fee;
+              validator.delegatorsCount = stakingPoolInfo.delegatorsCount;
+              validator.stake = stakingPoolInfo.stake;
             }
           });
         }
@@ -332,6 +347,7 @@ async function main() {
             currentValidators,
             currentProposals,
             onlineValidatingNodes,
+            currentPools,
           },
           wamp
         );
@@ -340,6 +356,7 @@ async function main() {
           {
             currentValidatorsCount: currentValidators.length,
             currentProposalsCount: currentProposals.length,
+            currentPoolsCount: currentPools.length,
             onlineNodesCount: onlineNodes.length,
             epochLength: epochStats.epochLength,
             epochStartHeight: epochStats.epochStartHeight,
@@ -369,6 +386,7 @@ async function main() {
       const stakingPoolsAccountId = new Set([
         ...currentValidators.map(({ account_id }) => account_id),
         ...currentProposals.map(({ account_id }) => account_id),
+        ...currentPools.map(({ account_id }) => account_id),
       ]);
 
       for (const stakingPoolAccountId of stakingPoolsAccountId) {
@@ -394,9 +412,15 @@ async function main() {
               "get_number_of_accounts",
               {}
             );
+            const stake = await nearRpc.callViewMethod(
+              stakingPoolAccountId,
+              "get_total_staked_balance",
+              {}
+            );
             stakingPoolsInfo.set(stakingPoolAccountId, {
               fee,
               delegatorsCount,
+              stake,
             });
           }
         } catch (error) {
