@@ -120,7 +120,7 @@ class ValidatorRow extends React.PureComponent<Props, State> {
                           text="next epoch upcoming validating nodes"
                           tooltipKey="new"
                         >
-                          New
+                          Next Epoch
                         </ValidatingLabel>
                       ) : node.removed ? (
                         <ValidatingLabel
@@ -128,7 +128,7 @@ class ValidatorRow extends React.PureComponent<Props, State> {
                           text="next epoch kick out nodes"
                           tooltipKey="kickout"
                         >
-                          Kickout
+                          Leaving
                         </ValidatingLabel>
                       ) : (
                         <ValidatingLabel
