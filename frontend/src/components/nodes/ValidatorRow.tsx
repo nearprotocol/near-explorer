@@ -114,7 +114,7 @@ class ValidatorRow extends React.PureComponent<Props, State> {
                         >
                           Pending
                         </ValidatingLabel>
-                      ) : node.new ? (
+                      ) : node.validatorStatus === "new" ? (
                         <ValidatingLabel
                           type="new"
                           text="next epoch upcoming validating nodes"
@@ -122,7 +122,7 @@ class ValidatorRow extends React.PureComponent<Props, State> {
                         >
                           Next Epoch
                         </ValidatingLabel>
-                      ) : node.removed ? (
+                      ) : node.validatorStatus === "removed" ? (
                         <ValidatingLabel
                           type="kickout"
                           text="next epoch kick out nodes"

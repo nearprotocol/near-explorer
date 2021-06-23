@@ -22,8 +22,9 @@ export interface BaseValidationNodeInfo {
   num_expected_blocks?: number;
   public_key: string;
   stake: string;
-  new?: boolean;
-  removed?: boolean;
+  validatorStatus?: "new" | "removed";
+  // new?: boolean;
+  // removed?: boolean;
   shards?: [number];
   nodeInfo?: NodeInfo;
 }

@@ -9,6 +9,7 @@ const nearRpc = new nearApi.providers.JsonRpcProvider(nearRpcUrl);
 let seatPrice = null;
 let totalStake = null;
 let currentEpochStartHeight = null;
+let currentValidatorsMap = new Map();
 
 // TODO: Provide an equivalent method in near-api-js, so we don't need to hack it around.
 nearRpc.callViewMethod = async function (contractName, methodName, args) {
@@ -31,8 +32,14 @@ const queryEpochStats = async () => {
     networkProtocolConfig.avg_hidden_validator_seats_per_shard.reduce(
       (a, b) => a + b
     );
+
   const currentProposals = epochStatus.current_proposals;
   const currentValidators = getCurrentNodes(epochStatus);
+
+  // getCurrentNodes(epochStatus).forEach((validator) => {
+  //   // currentValidatorsMap.set()
+  // });
+
   const { epoch_start_height: epochStartHeight } = epochStatus;
   const {
     epoch_length: epochLength,
@@ -66,27 +73,23 @@ const queryEpochStats = async () => {
   };
 };
 
-const signNewValidators = (newValidators) => {
-  for (let i = 0; i < newValidators.length; i++) {
-    newValidators[i].new = true;
-  }
-};
-
-const signRemovedValidators = (removedValidators) => {
-  for (let i = 0; i < removedValidators.length; i++) {
-    removedValidators[i].removed = true;
+const setValidatorStatus = (validators, status) => {
+  for (let i = 0; i < validators.length; i++) {
+    validators[i].validatorStatus = status;
   }
 };
 
 const getCurrentNodes = (epochStatus) => {
-  let currentValidators = epochStatus.current_validators;
-  let nextValidators = epochStatus.next_validators;
+  let {
+    current_validators: currentValidators,
+    next_validators: nextValidators,
+  } = epochStatus;
   const {
     newValidators,
     removedValidators,
   } = nearApi.validators.diffEpochValidators(currentValidators, nextValidators);
-  signNewValidators(newValidators);
-  signRemovedValidators(removedValidators);
+  setValidatorStatus(newValidators, "new");
+  setValidatorStatus(removedValidators, "removed");
   currentValidators = currentValidators.concat(newValidators);
   return currentValidators;
 };

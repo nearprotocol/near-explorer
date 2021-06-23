@@ -320,7 +320,7 @@ async function main() {
             if (stakingPoolInfo) {
               validator.fee = stakingPoolInfo.fee;
               validator.delegatorsCount = stakingPoolInfo.delegatorsCount;
-              validator.stake = stakingPoolInfo.stake;
+              // validator.stake = stakingPoolInfo.stake;
             }
           });
           currentProposals.forEach((validator) => {
@@ -389,6 +389,8 @@ async function main() {
         ...currentPools.map(({ account_id }) => account_id),
       ]);
 
+      // console.log("========== stakingPoolsAccountId =============", stakingPoolsAccountId);
+
       for (const stakingPoolAccountId of stakingPoolsAccountId) {
         try {
           const account = await nearRpc.query({
@@ -422,6 +424,8 @@ async function main() {
               delegatorsCount,
               stake,
             });
+
+            // console.log("========== stakingPoolsInfo ==========", stakingPoolsInfo);
           }
         } catch (error) {
           console.warn(
