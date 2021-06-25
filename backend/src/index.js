@@ -307,10 +307,10 @@ async function main() {
           ...epochStats.totalValidatorsPool.values(),
         ]);
 
-        // TODO awoid doble request to extendWithTelemetryInfo by filtering by label
-
         const onlineValidatingNodes = pickOnlineValidatingNode(
-          await extendWithTelemetryInfo(currentValidators)
+          totalValidatorsPool.filter(
+            (i) => i.validatorStatus && i.validatorStatus !== "proposal"
+          )
         );
 
         const onlineNodes = await queryOnlineNodes();

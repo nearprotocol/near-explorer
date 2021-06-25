@@ -9,12 +9,19 @@ interface CumulativeStake {
 
 const CumulativeStakeChart = ({ value }: Props) => (
   <div className="cumulative-stake-chart">
-    <div className="total-value" style={{ width: `${value.total}%` }} />
+    <div
+      className="total-value"
+      style={{ width: value.total ? `${value.total}%` : "0%" }}
+    />
     <div
       className="current-value"
-      style={{ width: `${value.current - value.total}%` }}
+      style={{
+        width: value.current ? `${value.current - value.total}%` : "0%",
+      }}
     />
-    <div className="cumulative-stake-label">{value.current}%</div>
+    <div className="cumulative-stake-label">
+      {value.current ? `${value.current}%` : "N/A"}
+    </div>
     <style global jsx>{`
       .cumulative-stake-chart {
         width: 100%;

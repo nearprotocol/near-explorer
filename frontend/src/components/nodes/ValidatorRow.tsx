@@ -50,6 +50,24 @@ class ValidatorRow extends React.PureComponent<Props, State> {
     const nodeDetailsEnable = Boolean(
       (node.num_produced_blocks && node.num_expected_blocks) || node.nodeInfo
     );
+    // compute increaced stake of validator in the next epoch
+    const stakeProposed =
+      node.stakeProposed &&
+      (new BN(node.stake).gt(new BN(node.stakeProposed))
+        ? {
+            value: new BN(node.stake)
+              .sub(new BN(node.stakeProposed))
+              .toString(),
+            increace: false,
+          }
+        : new BN(node.stake).lt(new BN(node.stakeProposed))
+        ? {
+            value: new BN(node.stakeProposed)
+              .sub(new BN(node.stake))
+              .toString(),
+            increace: true,
+          }
+        : "same");
 
     if (node.stake && totalStake) {
       persntStake =
@@ -168,6 +186,21 @@ class ValidatorRow extends React.PureComponent<Props, State> {
                   <Balance amount={node.stake} label="NEAR" />
                 ) : (
                   "-"
+                )}
+                {stakeProposed && (
+                  <>
+                    <br />
+                    <small>
+                      {stakeProposed === "same" ? (
+                        "same"
+                      ) : (
+                        <>
+                          {stakeProposed.increace ? "+" : "-"}
+                          <Balance amount={stakeProposed.value} label="NEAR" />
+                        </>
+                      )}
+                    </small>
+                  </>
                 )}
               </td>
               <td>

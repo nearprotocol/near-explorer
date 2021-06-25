@@ -38,7 +38,10 @@ const queryEpochStats = async () => {
   const currentValidators = getCurrentNodes(epochStatus);
   const currentPools = await queryNodeValidators();
 
-  currentValidators.forEach((validator) => {
+  currentValidators.forEach((validator, i) => {
+    if (!currentValidators[i].validatorStatus) {
+      currentValidators[i].validatorStatus = "active";
+    }
     totalValidatorsPool.set(validator.account_id, validator);
   });
 
@@ -119,11 +122,7 @@ const getCurrentNodes = (epochStatus) => {
   } = nearApi.validators.diffEpochValidators(currentValidators, nextValidators);
   setValidatorStatus(newValidators, "new");
   setValidatorStatus(removedValidators, "leaving");
-
   currentValidators = currentValidators.concat(newValidators);
-
-  setValidatorStatus(currentValidators, "active");
-
   return currentValidators;
 };
 

@@ -22,6 +22,8 @@ export interface BaseValidationNodeInfo {
   num_expected_blocks?: number;
   public_key: string;
   stake: string;
+  stakeProposed?: string;
+  cumulativeStakeAmount?: BN;
   validatorStatus?: "active" | "new" | "leaving" | "proposal";
   networkHolder?: boolean;
   shards?: [number];
@@ -33,14 +35,7 @@ export interface StakingPoolInfo {
   delegatorsCount: number;
 }
 
-export interface StakeInfo {
-  cumulativeStakeAmount: BN;
-  totalStake: BN;
-}
-
-export type ValidationNodeInfo = BaseValidationNodeInfo &
-  StakingPoolInfo &
-  StakeInfo;
+export type ValidationNodeInfo = BaseValidationNodeInfo & StakingPoolInfo;
 
 export interface NodeStats {
   validatorsCount: number;
