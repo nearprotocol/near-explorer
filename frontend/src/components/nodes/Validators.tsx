@@ -39,63 +39,54 @@ class Validators extends React.PureComponent<Props> {
     return (
       <>
         <NodeConsumer>
-          {(context) => {
-            const validatorType =
-              type === "validators"
-                ? context.currentValidators
-                : type === "nodePools"
-                ? context.currentPools
-                : context.currentProposals;
-            return (
-              <>
-                {validatorType ? (
-                  <Table
-                    className="validators-section"
-                    pagination={
-                      validatorType.length > itemsPerPage
-                        ? {
-                            className: "validators-node-pagination",
-                            pageCount: Math.ceil(
-                              validatorType.length / itemsPerPage
-                            ),
-                            marginPagesDisplayed: 1,
-                            pageRangeDisplayed: 3,
-                            onPageChange: this.onPageChange,
-                          }
-                        : undefined
-                    }
-                  >
-                    <thead>
-                      <tr className="validators-header-row">
-                        <th />
-                        <th>#</th>
-                        <th>Validator</th>
-                        <th>Fee</th>
-                        <th>Delegators</th>
-                        <th className="text-right">Stake</th>
-                        {type !== "proposals" && <th>Cumulative Stake</th>}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <ValidatorsList
-                        validators={validatorType}
-                        pages={{
-                          startPage,
-                          endPage,
-                          activePage,
-                          itemsPerPage,
-                        }}
-                        cellCount={type === "proposals" ? 6 : 7}
-                        validatorType={type}
-                      />
-                    </tbody>
-                  </Table>
-                ) : (
-                  <PaginationSpinner hidden={false} />
-                )}
-              </>
-            );
-          }}
+          {(context) => (
+            <>
+              {context.totalValidatorsPool ? (
+                <Table
+                  className="validators-section"
+                  pagination={
+                    context.totalValidatorsPool.length > itemsPerPage
+                      ? {
+                          className: "validators-node-pagination",
+                          pageCount: Math.ceil(
+                            context.totalValidatorsPool.length / itemsPerPage
+                          ),
+                          marginPagesDisplayed: 1,
+                          pageRangeDisplayed: 3,
+                          onPageChange: this.onPageChange,
+                        }
+                      : undefined
+                  }
+                >
+                  <thead>
+                    <tr className="validators-header-row">
+                      <th />
+                      <th>#</th>
+                      <th>Validator</th>
+                      <th>Fee</th>
+                      <th>Delegators</th>
+                      <th className="text-right">Stake</th>
+                      {type !== "proposals" && <th>Cumulative Stake</th>}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <ValidatorsList
+                      validators={context.totalValidatorsPool}
+                      pages={{
+                        startPage,
+                        endPage,
+                        activePage,
+                        itemsPerPage,
+                      }}
+                      cellCount={7}
+                    />
+                  </tbody>
+                </Table>
+              ) : (
+                <PaginationSpinner hidden={false} />
+              )}
+            </>
+          )}
         </NodeConsumer>
         <style jsx global>{`
           .validators-node-pagination {

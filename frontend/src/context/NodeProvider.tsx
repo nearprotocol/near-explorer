@@ -8,7 +8,7 @@ export interface INodeContext {
   onlineNodes?: NodeInfo[];
   currentProposals?: ValidationNodeInfo[];
   onlineValidatingNodes?: NodeInfo[];
-  currentPools?: ValidationNodeInfo[];
+  totalValidatorsPool?: ValidationNodeInfo[];
 }
 
 const NodeContext = createContext<INodeContext>({});

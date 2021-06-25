@@ -3,13 +3,14 @@ const nearApi = require("near-api-js");
 const BN = require("bn.js");
 
 const { nearRpcUrl } = require("./config");
+const { queryNodeValidators } = require("./db-utils");
 
 const nearRpc = new nearApi.providers.JsonRpcProvider(nearRpcUrl);
 
 let seatPrice = null;
 let totalStake = null;
 let currentEpochStartHeight = null;
-let currentValidatorsMap = new Map();
+let totalValidatorsPool = new Map();
 
 // TODO: Provide an equivalent method in near-api-js, so we don't need to hack it around.
 nearRpc.callViewMethod = async function (contractName, methodName, args) {
@@ -35,10 +36,37 @@ const queryEpochStats = async () => {
 
   const currentProposals = epochStatus.current_proposals;
   const currentValidators = getCurrentNodes(epochStatus);
+  const currentPools = await queryNodeValidators();
 
-  // getCurrentNodes(epochStatus).forEach((validator) => {
-  //   // currentValidatorsMap.set()
-  // });
+  currentValidators.forEach((validator) => {
+    totalValidatorsPool.set(validator.account_id, validator);
+  });
+
+  currentProposals.forEach((proposal) => {
+    const activeValidator = totalValidatorsPool.get(proposal.account_id);
+    if (activeValidator) {
+      totalValidatorsPool.set(proposal.account_id, {
+        ...activeValidator,
+        stakeProposed: proposal.stake,
+      });
+    } else {
+      totalValidatorsPool.set(proposal.account_id, {
+        ...proposal,
+        validatorStatus: "proposal",
+      });
+    }
+  });
+
+  currentPools.forEach((pool) => {
+    const activePool = totalValidatorsPool.get(pool.account_id);
+    if (activePool) {
+      totalValidatorsPool.set(pool.account_id, activePool);
+    } else {
+      totalValidatorsPool.set(pool.account_id, {
+        account_id: pool.account_id,
+      });
+    }
+  });
 
   const { epoch_start_height: epochStartHeight } = epochStatus;
   const {
@@ -66,6 +94,7 @@ const queryEpochStats = async () => {
     epochProtocolVersion,
     currentValidators,
     currentProposals,
+    totalValidatorsPool,
     totalStake,
     seatPrice,
     genesisTime,
@@ -89,8 +118,12 @@ const getCurrentNodes = (epochStatus) => {
     removedValidators,
   } = nearApi.validators.diffEpochValidators(currentValidators, nextValidators);
   setValidatorStatus(newValidators, "new");
-  setValidatorStatus(removedValidators, "removed");
+  setValidatorStatus(removedValidators, "leaving");
+
   currentValidators = currentValidators.concat(newValidators);
+
+  setValidatorStatus(currentValidators, "active");
+
   return currentValidators;
 };
 

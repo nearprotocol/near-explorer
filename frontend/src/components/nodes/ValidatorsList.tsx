@@ -2,60 +2,68 @@ import BN from "bn.js";
 import React from "react";
 
 import * as N from "../../libraries/explorer-wamp/nodes";
+import {
+  NetworkStatsContext,
+  NetworkStatsContextProps,
+} from "../../context/NetworkStatsProvider";
 
 import ValidatorRow from "./ValidatorRow";
+
+const epochValidatorsStake = new Map();
 
 interface Props {
   validators: any;
   pages: any;
   cellCount: number;
-  validatorType: string;
 }
 
 class ValidatorsList extends React.PureComponent<Props> {
-  calculateStake = (nodeIndex: number, totalStake: BN) => {
-    let total = new BN(0);
-    let networkHolderIndex = [];
-    let networkStakeSafeAmount = totalStake.divn(3);
-
-    for (let i = 0; i <= nodeIndex; i++) {
-      total = total.add(new BN(this.props.validators[i].stake));
-
-      if (total.gt(networkStakeSafeAmount)) {
-        networkHolderIndex.push(i);
-      }
-    }
-    return { total, networkHolderIndex: networkHolderIndex[0] };
-  };
-
   render() {
     const {
       validators,
       pages: { startPage, endPage, activePage, itemsPerPage },
       cellCount,
-      validatorType,
     } = this.props;
-    const totalStake = validators.reduce(
-      (acc: BN, node: any) => acc.add(new BN(node.stake)),
-      new BN(0)
+
+    const { networkStats }: NetworkStatsContextProps = this.context;
+
+    let validatorsList = validators.sort(
+      (a: N.ValidationNodeInfo, b: N.ValidationNodeInfo) =>
+        new BN(b.stake).sub(new BN(a.stake))
     );
 
-    const validatorsList = validators
-      .sort((a: N.ValidationNodeInfo, b: N.ValidationNodeInfo) =>
-        new BN(b.stake).sub(new BN(a.stake))
-      )
-      .map((node: N.ValidationNodeInfo, index: number) => {
-        if (validatorType === "validators" || validatorType === "nodePools") {
-          return {
-            ...node,
-            totalStake: totalStake,
-            cumulativeStakeAmount: this.calculateStake(index, totalStake),
-          };
-        }
-        return node;
-      });
+    // filter validators list by 'active' and 'leaving' validators to culculate cumulative
+    // stake only for those validators
+    const activeValidatorsList = validatorsList.filter(
+      (i: N.ValidationNodeInfo) =>
+        i.validatorStatus &&
+        ["active", "leaving"].indexOf(i.validatorStatus) >= 0
+    );
 
-    // console.log("validators", validators?.filter((i) => (i.num_produced_blocks && i.num_expected_blocks) || i.nodeInfo));
+    activeValidatorsList.forEach(
+      (validator: N.ValidationNodeInfo, index: number) => {
+        let total = new BN(0);
+        for (let i = 0; i <= index; i++) {
+          total = total.add(new BN(activeValidatorsList[i].stake));
+          epochValidatorsStake.set(validator.account_id, total);
+        }
+      }
+    );
+
+    validatorsList.forEach((validator: N.ValidationNodeInfo, index: number) => {
+      const validatorCumStake = epochValidatorsStake.get(validator.account_id);
+      if (validatorCumStake) {
+        validatorsList[index].cumulativeStakeAmount = validatorCumStake;
+      }
+    });
+
+    validatorsList.some((validator: N.ValidationNodeInfo, index: number) =>
+      networkStats?.totalStake &&
+      validator.cumulativeStakeAmount &&
+      validator.cumulativeStakeAmount.gt(networkStats.totalStake.divn(3))
+        ? (validatorsList[index].networkHolder = true)
+        : false
+    );
 
     return (
       <>
@@ -67,12 +75,14 @@ class ValidatorsList extends React.PureComponent<Props> {
               node={node}
               index={activePage * itemsPerPage + index + 1}
               cellCount={cellCount}
-              validatorType={validatorType}
+              totalStake={networkStats?.totalStake}
             />
           ))}
       </>
     );
   }
 }
+
+ValidatorsList.contextType = NetworkStatsContext;
 
 export default ValidatorsList;

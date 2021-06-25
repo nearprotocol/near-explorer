@@ -17,7 +17,7 @@ interface Props {
   node: N.ValidationNodeInfo;
   index: number;
   cellCount: number;
-  validatorType: string;
+  totalStake?: BN;
 }
 interface State {
   activeRow: boolean;
@@ -32,7 +32,7 @@ class ValidatorRow extends React.PureComponent<Props, State> {
     this.setState(({ activeRow }) => ({ activeRow: !activeRow }));
 
   render() {
-    const { node, index, cellCount, validatorType } = this.props;
+    const { node, index, cellCount, totalStake } = this.props;
     let persntStake = 0;
     let cumulativeStake = 0;
     let validatorFee =
@@ -51,26 +51,18 @@ class ValidatorRow extends React.PureComponent<Props, State> {
       (node.num_produced_blocks && node.num_expected_blocks) || node.nodeInfo
     );
 
-    if (node.stake && node.totalStake && validatorType !== "proposals") {
+    if (node.stake && totalStake) {
       persntStake =
-        new BN(node.stake).mul(new BN(10000)).div(node.totalStake).toNumber() /
-        100;
+        new BN(node.stake).mul(new BN(10000)).div(totalStake).toNumber() / 100;
     }
 
-    if (
-      node.stake &&
-      node.totalStake &&
-      node?.cumulativeStakeAmount &&
-      validatorType !== "proposals"
-    ) {
+    if (node.stake && totalStake && node?.cumulativeStakeAmount) {
       cumulativeStake =
-        new BN(node.cumulativeStakeAmount.total)
+        new BN(node.cumulativeStakeAmount)
           .mul(new BN(10000))
-          .div(node.totalStake)
+          .div(totalStake)
           .toNumber() / 100;
     }
-
-    // console.log("node", node);
 
     return (
       <DatabaseConsumer>
@@ -104,43 +96,41 @@ class ValidatorRow extends React.PureComponent<Props, State> {
 
               <td>
                 <Row noGutters className="align-items-center">
-                  {validatorType !== "nodePools" ? (
-                    <Col xs="2" className="validators-node-label">
-                      {validatorType === "proposals" ? (
-                        <ValidatingLabel
-                          type="pending"
-                          text="node staked to be new validating one"
-                          tooltipKey="nodes"
-                        >
-                          Pending
-                        </ValidatingLabel>
-                      ) : node.validatorStatus === "new" ? (
-                        <ValidatingLabel
-                          type="new"
-                          text="next epoch upcoming validating nodes"
-                          tooltipKey="new"
-                        >
-                          Next Epoch
-                        </ValidatingLabel>
-                      ) : node.validatorStatus === "removed" ? (
-                        <ValidatingLabel
-                          type="kickout"
-                          text="next epoch kick out nodes"
-                          tooltipKey="kickout"
-                        >
-                          Leaving
-                        </ValidatingLabel>
-                      ) : (
-                        <ValidatingLabel
-                          type="active"
-                          text="current validating nodes"
-                          tooltipKey="current"
-                        >
-                          Active
-                        </ValidatingLabel>
-                      )}
-                    </Col>
-                  ) : null}
+                  <Col xs="2" className="validators-node-label">
+                    {node.validatorStatus === "proposal" ? (
+                      <ValidatingLabel
+                        type="pending"
+                        text="node staked to be new validating one"
+                        tooltipKey="nodes"
+                      >
+                        Proposal
+                      </ValidatingLabel>
+                    ) : node.validatorStatus === "new" ? (
+                      <ValidatingLabel
+                        type="new"
+                        text="next epoch upcoming validating nodes"
+                        tooltipKey="new"
+                      >
+                        Next Epoch
+                      </ValidatingLabel>
+                    ) : node.validatorStatus === "leaving" ? (
+                      <ValidatingLabel
+                        type="kickout"
+                        text="next epoch kick out nodes"
+                        tooltipKey="kickout"
+                      >
+                        Leaving
+                      </ValidatingLabel>
+                    ) : node.validatorStatus === "active" ? (
+                      <ValidatingLabel
+                        type="active"
+                        text="current validating nodes"
+                        tooltipKey="current"
+                      >
+                        Active
+                      </ValidatingLabel>
+                    ) : null}
+                  </Col>
 
                   <Col className="validator-name">
                     <Row noGutters>
@@ -180,16 +170,14 @@ class ValidatorRow extends React.PureComponent<Props, State> {
                   "-"
                 )}
               </td>
-              {validatorType !== "proposals" && (
-                <td>
-                  <CumulativeStakeChart
-                    value={{
-                      total: cumulativeStake - persntStake,
-                      current: cumulativeStake,
-                    }}
-                  />
-                </td>
-              )}
+              <td>
+                <CumulativeStakeChart
+                  value={{
+                    total: cumulativeStake - persntStake,
+                    current: cumulativeStake,
+                  }}
+                />
+              </td>
             </TableRow>
 
             {nodeDetailsEnable && (
@@ -356,18 +344,15 @@ class ValidatorRow extends React.PureComponent<Props, State> {
               </TableCollapseRow>
             )}
 
-            {validatorType !== "proposals" &&
-              node?.cumulativeStakeAmount &&
-              node?.cumulativeStakeAmount.networkHolderIndex + 1 === index && (
-                <tr className="cumulative-stake-holders-row">
-                  <td colSpan={cellCount} className="warning-text text-center">
-                    Validators 1 -{" "}
-                    {node?.cumulativeStakeAmount.networkHolderIndex + 1} hold a
-                    cumulative stake above 33%. Delegating to the validators
-                    below improves the decentralization of the network.
-                  </td>
-                </tr>
-              )}
+            {node?.cumulativeStakeAmount && node?.networkHolder && (
+              <tr className="cumulative-stake-holders-row">
+                <td colSpan={cellCount} className="warning-text text-center">
+                  Validators 1 - {index} hold a cumulative stake above 33%.
+                  Delegating to the validators below improves the
+                  decentralization of the network.
+                </td>
+              </tr>
+            )}
 
             <style jsx global>{`
               @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500&display=swap");
