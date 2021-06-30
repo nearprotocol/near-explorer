@@ -1,6 +1,7 @@
 import { DATA_SOURCE_TYPE } from "../consts";
 
 import { ExplorerApi } from ".";
+import ContractsApi from "./contracts";
 
 export interface AccountBasicInfo {
   accountId: string;
@@ -31,7 +32,21 @@ export interface AccountPagination {
 
 type PaginatedAccountBasicInfo = AccountBasicInfo & AccountPagination;
 
+export interface AccountAccessKeysInfo {
+  publicKey: string;
+  accessKeyInfo: AccessKeyInfo;
+  isDeleted: boolean;
+}
+
+interface AccessKeyInfo {
+  nonce?: number;
+  permission: any;
+}
+
 export default class AccountsApi extends ExplorerApi {
+  static indexerCompatibilityAccessKeyPermissionKinds = new Map([
+    ["FullAccess", "FULL_ACCESS"],
+  ]);
   async getAccountInfo(accountId: string): Promise<Account> {
     const queryBasicInfo = async () => {
       let accountsBasicInfo;
@@ -219,5 +234,61 @@ export default class AccountsApi extends ExplorerApi {
 
   async queryAccount(accountId: string): Promise<any> {
     return await this.call<any>("get-account-details", [accountId]);
+  }
+
+  async queryAccountAccessKeys(accountId: string): Promise<any> {
+    const rpcAccessKeys = new Map();
+    let accessKeys;
+
+    try {
+      const indexedAccessKeys = await this.call<any>("select:INDEXER_BACKEND", [
+        `SELECT
+          public_key, deleted_by_receipt_id, permission_kind
+        FROM access_keys
+        WHERE account_id = :accountId`,
+        {
+          accountId,
+        },
+      ]);
+
+      await new ContractsApi()
+        .queryAccessKey(accountId)
+        .then((it) =>
+          it?.keys.forEach((i: any) => rpcAccessKeys.set(i.public_key, i))
+        );
+
+      accessKeys = indexedAccessKeys?.map((accessKey: any) => {
+        const indexedAccessKey = rpcAccessKeys.get(accessKey.public_key);
+        if (indexedAccessKey) {
+          return {
+            publicKey: indexedAccessKey.public_key,
+            accessKeyInfo: {
+              ...indexedAccessKey.access_key,
+              permission:
+                typeof indexedAccessKey.access_key.permission === "string"
+                  ? AccountsApi.indexerCompatibilityAccessKeyPermissionKinds.get(
+                      indexedAccessKey.access_key.permission
+                    )
+                  : indexedAccessKey.access_key.permission,
+            },
+            isDeleted: Boolean(accessKey.deleted_by_receipt_id),
+          };
+        }
+        return {
+          publicKey: accessKey.public_key,
+          accessKeyInfo: {
+            permission: accessKey.permission_kind,
+          },
+          isDeleted: Boolean(accessKey.deleted_by_receipt_id),
+        };
+      });
+      return accessKeys as AccountAccessKeysInfo;
+    } catch (error) {
+      console.error(
+        "AccountsApi.queryAccountAccessKeys failed to fetch data due to:"
+      );
+      console.error(error);
+      throw error;
+    }
   }
 }

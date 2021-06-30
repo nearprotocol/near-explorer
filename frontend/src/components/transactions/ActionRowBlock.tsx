@@ -7,7 +7,7 @@ import Timer from "../utils/Timer";
 export type ViewMode = "sparse" | "compact";
 export type DetalizationMode = "detailed" | "minimal";
 export interface Props {
-  signerId: string;
+  signerId?: string;
   blockTimestamp?: number;
   detailsLink?: React.ReactNode;
   viewMode: ViewMode;
@@ -18,6 +18,7 @@ export interface Props {
   children?: React.ReactNode;
   status?: React.ReactNode;
   isFinal?: boolean;
+  fullwidth?: boolean;
 }
 
 class ActionRowBlock extends React.Component<Props> {
@@ -40,6 +41,7 @@ class ActionRowBlock extends React.Component<Props> {
       status,
       isFinal,
       children,
+      fullwidth,
     } = this.props;
 
     return (
@@ -50,11 +52,11 @@ class ActionRowBlock extends React.Component<Props> {
           </Col>
           <Col className="action-row-details">
             <Row noGutters className="action-row-message">
-              <Col md="8" xs="7">
+              <Col md={fullwidth ? "auto" : "8"} xs={fullwidth ? "auto" : "7"}>
                 <Row noGutters>
                   <Col className="action-row-title">{title}</Col>
                 </Row>
-                {detalizationMode === "detailed" ? (
+                {detalizationMode === "detailed" && signerId ? (
                   <Row noGutters>
                     <Col className="action-row-text">
                       by <AccountLink accountId={signerId} />
