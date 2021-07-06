@@ -17,7 +17,7 @@ interface Props {
   node: N.ValidationNodeInfo;
   index: number;
   cellCount: number;
-  validatorType: string;
+  totalStake?: BN;
 }
 interface State {
   activeRow: boolean;
@@ -32,7 +32,7 @@ class ValidatorRow extends React.PureComponent<Props, State> {
     this.setState(({ activeRow }) => ({ activeRow: !activeRow }));
 
   render() {
-    const { node, index, cellCount, validatorType } = this.props;
+    const { node, index, cellCount, totalStake } = this.props;
     let persntStake = 0;
     let cumulativeStake = 0;
     let validatorFee =
@@ -50,22 +50,35 @@ class ValidatorRow extends React.PureComponent<Props, State> {
     const nodeDetailsEnable = Boolean(
       (node.num_produced_blocks && node.num_expected_blocks) || node.nodeInfo
     );
+    // compute increaced stake of validator in the next epoch
+    const stakeProposed =
+      node.stakeProposed &&
+      (new BN(node.stake).gt(new BN(node.stakeProposed))
+        ? {
+            value: new BN(node.stake)
+              .sub(new BN(node.stakeProposed))
+              .toString(),
+            increace: false,
+          }
+        : new BN(node.stake).lt(new BN(node.stakeProposed))
+        ? {
+            value: new BN(node.stakeProposed)
+              .sub(new BN(node.stake))
+              .toString(),
+            increace: true,
+          }
+        : "same");
 
-    if (node.stake && node.totalStake && validatorType !== "proposals") {
+    if (node.stake && totalStake) {
       persntStake =
-        new BN(node.stake).mul(new BN(10000)).div(node.totalStake).toNumber() /
-        100;
+        new BN(node.stake).mul(new BN(10000)).div(totalStake).toNumber() / 100;
     }
 
-    if (
-      node.totalStake &&
-      node?.cumulativeStakeAmount &&
-      validatorType !== "proposals"
-    ) {
+    if (node.stake && totalStake && node?.cumulativeStakeAmount) {
       cumulativeStake =
-        new BN(node.cumulativeStakeAmount.total)
+        new BN(node.cumulativeStakeAmount)
           .mul(new BN(10000))
-          .div(node.totalStake)
+          .div(totalStake)
           .toNumber() / 100;
     }
 
@@ -102,31 +115,31 @@ class ValidatorRow extends React.PureComponent<Props, State> {
               <td>
                 <Row noGutters className="align-items-center">
                   <Col xs="2" className="validators-node-label">
-                    {validatorType === "proposals" ? (
+                    {node.validatorStatus === "proposal" ? (
                       <ValidatingLabel
                         type="pending"
                         text="node staked to be new validating one"
                         tooltipKey="nodes"
                       >
-                        Pending
+                        Proposal
                       </ValidatingLabel>
-                    ) : node.new ? (
+                    ) : node.validatorStatus === "new" ? (
                       <ValidatingLabel
                         type="new"
                         text="next epoch upcoming validating nodes"
                         tooltipKey="new"
                       >
-                        New
+                        Next Epoch
                       </ValidatingLabel>
-                    ) : node.removed ? (
+                    ) : node.validatorStatus === "leaving" ? (
                       <ValidatingLabel
                         type="kickout"
                         text="next epoch kick out nodes"
                         tooltipKey="kickout"
                       >
-                        Kickout
+                        Leaving
                       </ValidatingLabel>
-                    ) : (
+                    ) : node.validatorStatus === "active" ? (
                       <ValidatingLabel
                         type="active"
                         text="current validating nodes"
@@ -134,7 +147,7 @@ class ValidatorRow extends React.PureComponent<Props, State> {
                       >
                         Active
                       </ValidatingLabel>
-                    )}
+                    ) : null}
                   </Col>
 
                   <Col className="validator-name">
@@ -174,17 +187,30 @@ class ValidatorRow extends React.PureComponent<Props, State> {
                 ) : (
                   "-"
                 )}
+                {stakeProposed && (
+                  <>
+                    <br />
+                    <small>
+                      {stakeProposed === "same" ? (
+                        "same"
+                      ) : (
+                        <>
+                          {stakeProposed.increace ? "+" : "-"}
+                          <Balance amount={stakeProposed.value} label="NEAR" />
+                        </>
+                      )}
+                    </small>
+                  </>
+                )}
               </td>
-              {validatorType !== "proposals" && (
-                <td>
-                  <CumulativeStakeChart
-                    value={{
-                      total: cumulativeStake - persntStake,
-                      current: cumulativeStake,
-                    }}
-                  />
-                </td>
-              )}
+              <td>
+                <CumulativeStakeChart
+                  value={{
+                    total: cumulativeStake - persntStake,
+                    current: cumulativeStake,
+                  }}
+                />
+              </td>
             </TableRow>
 
             {nodeDetailsEnable && (
@@ -351,18 +377,15 @@ class ValidatorRow extends React.PureComponent<Props, State> {
               </TableCollapseRow>
             )}
 
-            {validatorType !== "proposals" &&
-              node?.cumulativeStakeAmount &&
-              node?.cumulativeStakeAmount.networkHolderIndex + 1 === index && (
-                <tr className="cumulative-stake-holders-row">
-                  <td colSpan={cellCount} className="warning-text text-center">
-                    Validators 1 -{" "}
-                    {node?.cumulativeStakeAmount.networkHolderIndex + 1} hold a
-                    cumulative stake above 33%. Delegating to the validators
-                    below improves the decentralization of the network.
-                  </td>
-                </tr>
-              )}
+            {node?.cumulativeStakeAmount && node?.networkHolder && (
+              <tr className="cumulative-stake-holders-row">
+                <td colSpan={cellCount} className="warning-text text-center">
+                  Validators 1 - {index} hold a cumulative stake above 33%.
+                  Delegating to the validators below improves the
+                  decentralization of the network.
+                </td>
+              </tr>
+            )}
 
             <style jsx global>{`
               @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500&display=swap");

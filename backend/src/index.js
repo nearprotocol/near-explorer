@@ -34,6 +34,7 @@ const {
   extendWithTelemetryInfo,
   queryOnlineNodes,
   pickOnlineValidatingNode,
+  queryNodeValidators,
   getSyncedGenesis,
   queryDashboardBlocksStats,
   queryDashboardTransactionsStats,
@@ -62,6 +63,7 @@ const { calculateCirculatingSupply } = require("./aggregations");
 
 let currentValidators = [];
 let currentProposals = [];
+let totalValidatorsPool = [];
 let stakingPoolsInfo = new Map();
 
 async function startLegacySync() {
@@ -297,30 +299,29 @@ async function main() {
     try {
       if (wamp.session) {
         const epochStats = await queryEpochStats();
-        currentValidators = await extendWithTelemetryInfo(
-          epochStats.currentValidators
-        );
-        currentProposals = await extendWithTelemetryInfo(
-          epochStats.currentProposals
-        );
+
+        currentValidators = epochStats.currentValidators;
+        currentProposals = epochStats.currentProposals;
+
+        totalValidatorsPool = await extendWithTelemetryInfo([
+          ...epochStats.totalValidatorsPool.values(),
+        ]);
+
         const onlineValidatingNodes = pickOnlineValidatingNode(
-          currentValidators
+          totalValidatorsPool.filter(
+            (i) => i.validatorStatus && i.validatorStatus !== "proposal"
+          )
         );
+
         const onlineNodes = await queryOnlineNodes();
 
         if (stakingPoolsInfo) {
-          currentValidators.forEach((validator) => {
+          totalValidatorsPool.forEach((validator) => {
             const stakingPoolInfo = stakingPoolsInfo.get(validator.account_id);
             if (stakingPoolInfo) {
               validator.fee = stakingPoolInfo.fee;
               validator.delegatorsCount = stakingPoolInfo.delegatorsCount;
-            }
-          });
-          currentProposals.forEach((validator) => {
-            const stakingPoolInfo = stakingPoolsInfo.get(validator.account_id);
-            if (stakingPoolInfo) {
-              validator.fee = stakingPoolInfo.fee;
-              validator.delegatorsCount = stakingPoolInfo.delegatorsCount;
+              validator.stake = stakingPoolInfo.stake;
             }
           });
         }
@@ -332,6 +333,7 @@ async function main() {
             currentValidators,
             currentProposals,
             onlineValidatingNodes,
+            totalValidatorsPool,
           },
           wamp
         );
@@ -366,42 +368,55 @@ async function main() {
   // Periodic check of validators' staking pool fee and delegators count
   const regularFetchStakingPoolsInfo = async () => {
     try {
-      const stakingPoolsAccountId = new Set([
-        ...currentValidators.map(({ account_id }) => account_id),
-        ...currentProposals.map(({ account_id }) => account_id),
+      const stakingPoolsAccount = new Set([
+        ...totalValidatorsPool.map(({ account_id, stake }) => ({
+          account_id,
+          stake,
+        })),
       ]);
 
-      for (const stakingPoolAccountId of stakingPoolsAccountId) {
+      for (const stakingPoolAccount of stakingPoolsAccount) {
         try {
           const account = await nearRpc.query({
             request_type: "view_account",
-            account_id: stakingPoolAccountId,
+            account_id: stakingPoolAccount.account_id,
             finality: "final",
           });
+
+          const poolStake = stakingPoolAccount?.stake;
+
           if (account.code_hash === "11111111111111111111111111111111") {
-            stakingPoolsInfo.set(stakingPoolAccountId, {
+            stakingPoolsInfo.set(stakingPoolAccount.account_id, {
               fee: null,
               delegatorsCount: null,
             });
           } else {
             const fee = await nearRpc.callViewMethod(
-              stakingPoolAccountId,
+              stakingPoolAccount.account_id,
               "get_reward_fee_fraction",
               {}
             );
             const delegatorsCount = await nearRpc.callViewMethod(
-              stakingPoolAccountId,
+              stakingPoolAccount.account_id,
               "get_number_of_accounts",
               {}
             );
-            stakingPoolsInfo.set(stakingPoolAccountId, {
+            const stake =
+              poolStake ??
+              (await nearRpc.callViewMethod(
+                stakingPoolAccount.account_id,
+                "get_total_staked_balance",
+                {}
+              ));
+            stakingPoolsInfo.set(stakingPoolAccount.account_id, {
               fee,
               delegatorsCount,
+              stake,
             });
           }
         } catch (error) {
           console.warn(
-            `Regular regular fetching staking pool ${stakingPoolAccountId} info crashed due to:`,
+            `Regular regular fetching staking pool ${stakingPoolAccount.account_id} info crashed due to:`,
             error
           );
         }

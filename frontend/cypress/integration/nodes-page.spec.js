@@ -9,15 +9,13 @@ context("Nodes", () => {
 
   it("Check for node page", () => {
     cy.url().should("include", "/nodes/validators");
-    cy.get("#validator-node").contains("Validating");
+    cy.get(".content-title h1").contains("Nodes");
     // cy.get("#online-node").contains("Online-nodes");
-    cy.get("#proposal-node").contains("Proposed");
   });
 
-  it("Check validators tab", () => {
+  it("Check validators list", () => {
     cy.url().should("include", "/nodes/validators");
-    cy.get(".node-selector").should("have.class", "node-selected");
-    cy.get(".validator-nodes-row td", { timeout: 10000 }).should("exist");
+    cy.get(".validator-nodes-row td", { timeout: 20000 }).should("exist");
   });
 
   // it("Check online nodes tab", () => {
@@ -30,11 +28,6 @@ context("Nodes", () => {
   //     cy.get($el).should("exist", $el.text())
   //   );
   // });
-
-  it("Check proposal nodes tab", () => {
-    cy.get("#proposal-node").click();
-    cy.get(".node-selector").should("have.class", "node-selected");
-  });
 
   // it("Check nodes map tab", () => {
   //   cy.get("#node-map").click();

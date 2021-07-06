@@ -24,7 +24,8 @@ class NodesContentHeader extends React.PureComponent<Props> {
         <Col className="content-title">
           <h1 style={{ fontSize: "31px", marginBottom: "0px" }}>Nodes</h1>
         </Col>
-        <Col xs="12">
+        {/* Currently hide navigation as there is only one tab */}
+        <Col xs="12" style={{ visibility: "hidden" }}>
           <NodeNav role={this.props.navRole} />
         </Col>
       </Row>

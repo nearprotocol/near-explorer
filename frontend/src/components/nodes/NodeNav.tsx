@@ -51,23 +51,7 @@ class NodeNav extends React.PureComponent<Props> {
                   </a>
                 </Link>
               </Col> */}
-              <Col
-                xs="auto"
-                className={`node-selector pt-2 pb-2 ${
-                  role === "proposals" ? `node-selected` : ""
-                }`}
-              >
-                <Link href="/nodes/proposals">
-                  <a className="node-link" id="proposal-node">
-                    Proposed{" "}
-                    <Badge pill className="nodes-amount-label proposed">
-                      {context.networkStats
-                        ? context.networkStats.currentProposalsCount
-                        : "--"}
-                    </Badge>
-                  </a>
-                </Link>
-              </Col>
+
               {/* <Col className="node-selector pt-2 pb-2">
                 <Link href="/nodes/map">
                   <a className="node-link" id="node-map">
@@ -109,11 +93,6 @@ class NodeNav extends React.PureComponent<Props> {
               .nodes-amount-label.online {
                 background-color: #e5e5e6;
                 color: #72727a;
-              }
-
-              .nodes-amount-label.proposed {
-                background-color: #ffecd6;
-                color: #995200;
               }
 
               .node-link,

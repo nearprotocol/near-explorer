@@ -1,198 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<ValidatorsList /> renders proposals list 1`] = `
-Array [
-  <tr
-    className="jsx-4079813474 table-row validator-nodes-row mx-0 "
-  >
-    <td
-      className="jsx-1618374794 collapse-row-arrow "
-      onClick={[Function]}
-    >
-      <img
-        className="jsx-1618374794"
-        src="/static/images/icon-maximize.svg"
-        style={
-          Object {
-            "width": "16px",
-          }
-        }
-      />
-    </td>
-    <td
-      className="jsx-1618374794 order"
-    >
-      25
-    </td>
-    <td
-      className="jsx-1618374794"
-    >
-      <div
-        className="align-items-center row no-gutters"
-      >
-        <div
-          className="validators-node-label col-2"
-        >
-          <span
-            className="validating-label pending badge"
-            onBlur={[Function]}
-            onFocus={[Function]}
-            onMouseOut={[Function]}
-            onMouseOver={[Function]}
-          >
-            Pending
-          </span>
-        </div>
-        <div
-          className="validator-name col"
-        >
-          <div
-            className="row no-gutters"
-          >
-            <div
-              className="validator-nodes-text col"
-              title="@astro-stakers.poolv1.near"
-            >
-              astro-stakers.poolv1.near
-            </div>
-          </div>
-          <div
-            className="row no-gutters"
-          >
-            <div
-              className="validator-nodes-text validator-node-pub-key col"
-              title="ed25519:2nPSBCzjqikgwrqUMcuEVReJhmkC91eqJGPGqH9sZc28"
-            >
-              ed25519:2nPSBCzjqikgwrqUMcuEVReJhmkC91eqJGPGqH9sZc28
-            </div>
-          </div>
-        </div>
-      </div>
-    </td>
-    <td
-      className="jsx-1618374794"
-    >
-      1%
-    </td>
-    <td
-      className="jsx-1618374794"
-    >
-      <div
-        className="spinner-border spinner-border-sm"
-      />
-    </td>
-    <td
-      className="jsx-1618374794 text-right validator-nodes-text stake-text"
-    >
-      <span
-        onBlur={[Function]}
-        onFocus={[Function]}
-        onMouseOut={[Function]}
-        onMouseOver={[Function]}
-      >
-        19,378,033.39859
-         
-        NEAR
-      </span>
-    </td>
-  </tr>,
-  <tr
-    className="jsx-4079813474 table-row validator-nodes-row mx-0 "
-  >
-    <td
-      className="jsx-1618374794 collapse-row-arrow disable"
-      onClick={[Function]}
-    >
-      <img
-        className="jsx-1618374794"
-        src="/static/images/icon-maximize.svg"
-        style={
-          Object {
-            "width": "16px",
-          }
-        }
-      />
-    </td>
-    <td
-      className="jsx-1618374794 order"
-    >
-      26
-    </td>
-    <td
-      className="jsx-1618374794"
-    >
-      <div
-        className="align-items-center row no-gutters"
-      >
-        <div
-          className="validators-node-label col-2"
-        >
-          <span
-            className="validating-label pending badge"
-            onBlur={[Function]}
-            onFocus={[Function]}
-            onMouseOut={[Function]}
-            onMouseOver={[Function]}
-          >
-            Pending
-          </span>
-        </div>
-        <div
-          className="validator-name col"
-        >
-          <div
-            className="row no-gutters"
-          >
-            <div
-              className="validator-nodes-text col"
-              title="@chorusone.poolv1.near"
-            >
-              chorusone.poolv1.near
-            </div>
-          </div>
-          <div
-            className="row no-gutters"
-          >
-            <div
-              className="validator-nodes-text validator-node-pub-key col"
-              title="ed25519:AZwJAgu2qRxHwdpj8ioZEFGcc2jbaZGN7ZvUe7CuXtM7"
-            >
-              ed25519:AZwJAgu2qRxHwdpj8ioZEFGcc2jbaZGN7ZvUe7CuXtM7
-            </div>
-          </div>
-        </div>
-      </div>
-    </td>
-    <td
-      className="jsx-1618374794"
-    >
-      8%
-    </td>
-    <td
-      className="jsx-1618374794"
-    >
-      <div
-        className="spinner-border spinner-border-sm"
-      />
-    </td>
-    <td
-      className="jsx-1618374794 text-right validator-nodes-text stake-text"
-    >
-      <span
-        onBlur={[Function]}
-        onFocus={[Function]}
-        onMouseOut={[Function]}
-        onMouseOver={[Function]}
-      >
-        6,174,390.41291
-         
-        NEAR
-      </span>
-    </td>
-  </tr>,
-]
-`;
-
 exports[`<ValidatorsList /> renders validators list 1`] = `
 Array [
   <tr
@@ -227,13 +34,13 @@ Array [
           className="validators-node-label col-2"
         >
           <span
-            className="validating-label active badge"
+            className="validating-label new badge"
             onBlur={[Function]}
             onFocus={[Function]}
             onMouseOut={[Function]}
             onMouseOver={[Function]}
           >
-            Active
+            Next Epoch
           </span>
         </div>
         <div
@@ -287,6 +94,24 @@ Array [
          
         NEAR
       </span>
+      <br
+        className="jsx-1618374794"
+      />
+      <small
+        className="jsx-1618374794"
+      >
+        -
+        <span
+          onBlur={[Function]}
+          onFocus={[Function]}
+          onMouseOut={[Function]}
+          onMouseOver={[Function]}
+        >
+          15,708,597.22739
+           
+          NEAR
+        </span>
+      </small>
     </td>
     <td
       className="jsx-1618374794"
@@ -306,15 +131,14 @@ Array [
           className="jsx-1486326988 current-value"
           style={
             Object {
-              "width": "71.5%",
+              "width": "0%",
             }
           }
         />
         <div
           className="jsx-1486326988 cumulative-stake-label"
         >
-          71.5
-          %
+          N/A
         </div>
       </div>
     </td>
@@ -351,13 +175,13 @@ Array [
           className="validators-node-label col-2"
         >
           <span
-            className="validating-label active badge"
+            className="validating-label kickout badge"
             onBlur={[Function]}
             onFocus={[Function]}
             onMouseOut={[Function]}
             onMouseOver={[Function]}
           >
-            Active
+            Leaving
           </span>
         </div>
         <div
@@ -411,6 +235,24 @@ Array [
          
         NEAR
       </span>
+      <br
+        className="jsx-1618374794"
+      />
+      <small
+        className="jsx-1618374794"
+      >
+        +
+        <span
+          onBlur={[Function]}
+          onFocus={[Function]}
+          onMouseOut={[Function]}
+          onMouseOver={[Function]}
+        >
+          756,812.4902
+           
+          NEAR
+        </span>
+      </small>
     </td>
     <td
       className="jsx-1618374794"
@@ -422,7 +264,7 @@ Array [
           className="jsx-1486326988 total-value"
           style={
             Object {
-              "width": "71.51%",
+              "width": "0%",
             }
           }
         />
@@ -430,15 +272,14 @@ Array [
           className="jsx-1486326988 current-value"
           style={
             Object {
-              "width": "14.86%",
+              "width": "0%",
             }
           }
         />
         <div
           className="jsx-1486326988 cumulative-stake-label"
         >
-          86.37
-          %
+          N/A
         </div>
       </div>
     </td>
@@ -535,6 +376,24 @@ Array [
          
         NEAR
       </span>
+      <br
+        className="jsx-1618374794"
+      />
+      <small
+        className="jsx-1618374794"
+      >
+        +
+        <span
+          onBlur={[Function]}
+          onFocus={[Function]}
+          onMouseOut={[Function]}
+          onMouseOver={[Function]}
+        >
+          1,093,573.2829
+           
+          NEAR
+        </span>
+      </small>
     </td>
     <td
       className="jsx-1618374794"
@@ -546,7 +405,7 @@ Array [
           className="jsx-1486326988 total-value"
           style={
             Object {
-              "width": "86.38%",
+              "width": "0%",
             }
           }
         />
@@ -554,15 +413,14 @@ Array [
           className="jsx-1486326988 current-value"
           style={
             Object {
-              "width": "13.620000000000005%",
+              "width": "0%",
             }
           }
         />
         <div
           className="jsx-1486326988 cumulative-stake-label"
         >
-          100
-          %
+          N/A
         </div>
       </div>
     </td>

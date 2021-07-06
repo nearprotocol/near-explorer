@@ -1,11 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<ValidatorRow /> renders row on Proposals tab 1`] = `
+exports[`<ValidatorRow /> renders Validators row without cumulative stake 1`] = `
 <tr
   className="jsx-4079813474 table-row validator-nodes-row mx-0 "
 >
   <td
-    className="jsx-1618374794 collapse-row-arrow disable"
+    className="jsx-1618374794 collapse-row-arrow "
     onClick={[Function]}
   >
     <img
@@ -21,7 +21,7 @@ exports[`<ValidatorRow /> renders row on Proposals tab 1`] = `
   <td
     className="jsx-1618374794 order"
   >
-    1
+    2
   </td>
   <td
     className="jsx-1618374794"
@@ -33,13 +33,13 @@ exports[`<ValidatorRow /> renders row on Proposals tab 1`] = `
         className="validators-node-label col-2"
       >
         <span
-          className="validating-label pending badge"
+          className="validating-label kickout badge"
           onBlur={[Function]}
           onFocus={[Function]}
           onMouseOut={[Function]}
           onMouseOver={[Function]}
         >
-          Pending
+          Leaving
         </span>
       </div>
       <div
@@ -50,9 +50,9 @@ exports[`<ValidatorRow /> renders row on Proposals tab 1`] = `
         >
           <div
             className="validator-nodes-text col"
-            title="@magic.poolv1.near"
+            title="@dokiacapital.pool.6fb1358"
           >
-            magic.poolv1.near
+            dokiacapital.pool.6fb1358
           </div>
         </div>
         <div
@@ -60,9 +60,9 @@ exports[`<ValidatorRow /> renders row on Proposals tab 1`] = `
         >
           <div
             className="validator-nodes-text validator-node-pub-key col"
-            title="ed25519:5fwufMXx9CTyLRkz7x3htQa3rFGzFZuz6d43LhCTmKCS"
+            title="ed25519:935JMz1vLcJxFApG3TY4MA4RHhvResvoGwCrQoJxHPn9"
           >
-            ed25519:5fwufMXx9CTyLRkz7x3htQa3rFGzFZuz6d43LhCTmKCS
+            ed25519:935JMz1vLcJxFApG3TY4MA4RHhvResvoGwCrQoJxHPn9
           </div>
         </div>
       </div>
@@ -71,12 +71,12 @@ exports[`<ValidatorRow /> renders row on Proposals tab 1`] = `
   <td
     className="jsx-1618374794"
   >
-    100%
+    10%
   </td>
   <td
     className="jsx-1618374794"
   >
-    121
+    11
   </td>
   <td
     className="jsx-1618374794 text-right validator-nodes-text stake-text"
@@ -87,15 +87,62 @@ exports[`<ValidatorRow /> renders row on Proposals tab 1`] = `
       onMouseOut={[Function]}
       onMouseOver={[Function]}
     >
-      10,831,273.77981
+      91,037.77039
        
       NEAR
     </span>
+    <br
+      className="jsx-1618374794"
+    />
+    <small
+      className="jsx-1618374794"
+    >
+      +
+      <span
+        onBlur={[Function]}
+        onFocus={[Function]}
+        onMouseOut={[Function]}
+        onMouseOver={[Function]}
+      >
+        4,701,218.17312
+         
+        NEAR
+      </span>
+    </small>
+  </td>
+  <td
+    className="jsx-1618374794"
+  >
+    <div
+      className="jsx-1486326988 cumulative-stake-chart"
+    >
+      <div
+        className="jsx-1486326988 total-value"
+        style={
+          Object {
+            "width": "-100%",
+          }
+        }
+      />
+      <div
+        className="jsx-1486326988 current-value"
+        style={
+          Object {
+            "width": "0%",
+          }
+        }
+      />
+      <div
+        className="jsx-1486326988 cumulative-stake-label"
+      >
+        N/A
+      </div>
+    </div>
   </td>
 </tr>
 `;
 
-exports[`<ValidatorRow /> renders row on Validators tab 1`] = `
+exports[`<ValidatorRow /> renders full Validators row 1`] = `
 Array [
   <tr
     className="jsx-4079813474 table-row validator-nodes-row mx-0 "
@@ -187,6 +234,24 @@ Array [
          
         NEAR
       </span>
+      <br
+        className="jsx-1618374794"
+      />
+      <small
+        className="jsx-1618374794"
+      >
+        +
+        <span
+          onBlur={[Function]}
+          onFocus={[Function]}
+          onMouseOut={[Function]}
+          onMouseOver={[Function]}
+        >
+          4,701,218.17312
+           
+          NEAR
+        </span>
+      </small>
     </td>
     <td
       className="jsx-1618374794"
@@ -213,8 +278,7 @@ Array [
         <div
           className="jsx-1486326988 cumulative-stake-label"
         >
-          100
-          %
+          100%
         </div>
       </div>
     </td>
@@ -226,11 +290,142 @@ Array [
       className="jsx-1618374794 warning-text text-center"
       colSpan={7}
     >
-      Validators 1 -
-       
+      Validators 1 - 
       1
        hold a cumulative stake above 33%. Delegating to the validators below improves the decentralization of the network.
     </td>
   </tr>,
 ]
+`;
+
+exports[`<ValidatorRow /> renders simple Validators row 1`] = `
+<tr
+  className="jsx-4079813474 table-row validator-nodes-row mx-0 "
+>
+  <td
+    className="jsx-1618374794 collapse-row-arrow "
+    onClick={[Function]}
+  >
+    <img
+      className="jsx-1618374794"
+      src="/static/images/icon-maximize.svg"
+      style={
+        Object {
+          "width": "16px",
+        }
+      }
+    />
+  </td>
+  <td
+    className="jsx-1618374794 order"
+  >
+    3
+  </td>
+  <td
+    className="jsx-1618374794"
+  >
+    <div
+      className="align-items-center row no-gutters"
+    >
+      <div
+        className="validators-node-label col-2"
+      />
+      <div
+        className="validator-name col"
+      >
+        <div
+          className="row no-gutters"
+        >
+          <div
+            className="validator-nodes-text col"
+            title="@dokiacapital.pool.6fb1358"
+          >
+            dokiacapital.pool.6fb1358
+          </div>
+        </div>
+        <div
+          className="row no-gutters"
+        >
+          <div
+            className="validator-nodes-text validator-node-pub-key col"
+            title="ed25519:935JMz1vLcJxFApG3TY4MA4RHhvResvoGwCrQoJxHPn9"
+          >
+            ed25519:935JMz1vLcJxFApG3TY4MA4RHhvResvoGwCrQoJxHPn9
+          </div>
+        </div>
+      </div>
+    </div>
+  </td>
+  <td
+    className="jsx-1618374794"
+  >
+    10%
+  </td>
+  <td
+    className="jsx-1618374794"
+  >
+    11
+  </td>
+  <td
+    className="jsx-1618374794 text-right validator-nodes-text stake-text"
+  >
+    <span
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onMouseOut={[Function]}
+      onMouseOver={[Function]}
+    >
+      91,037.77039
+       
+      NEAR
+    </span>
+    <br
+      className="jsx-1618374794"
+    />
+    <small
+      className="jsx-1618374794"
+    >
+      +
+      <span
+        onBlur={[Function]}
+        onFocus={[Function]}
+        onMouseOut={[Function]}
+        onMouseOver={[Function]}
+      >
+        4,701,218.17312
+         
+        NEAR
+      </span>
+    </small>
+  </td>
+  <td
+    className="jsx-1618374794"
+  >
+    <div
+      className="jsx-1486326988 cumulative-stake-chart"
+    >
+      <div
+        className="jsx-1486326988 total-value"
+        style={
+          Object {
+            "width": "-100%",
+          }
+        }
+      />
+      <div
+        className="jsx-1486326988 current-value"
+        style={
+          Object {
+            "width": "0%",
+          }
+        }
+      />
+      <div
+        className="jsx-1486326988 cumulative-stake-label"
+      >
+        N/A
+      </div>
+    </div>
+  </td>
+</tr>
 `;
