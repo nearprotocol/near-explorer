@@ -5,13 +5,16 @@ import { Container } from "react-bootstrap";
 
 import Mixpanel from "../../libraries/mixpanel";
 import AccountsApi from "../../libraries/explorer-wamp/accounts";
+import ContractsApi from "../../libraries/explorer-wamp/contracts";
 
 import AccountDetails from "../../components/accounts/AccountDetails";
 import ContractDetails from "../../components/contracts/ContractDetails";
 import Transactions from "../../components/transactions/Transactions";
+import AccountAccessKeys from "../../components/accounts/AccountAccessKeys";
 import Content from "../../components/utils/Content";
 
 import TransactionIcon from "../../../public/static/images/icon-t-transactions.svg";
+import KeysIcon from "../../../public/static/images/icon-t-key-swap.svg";
 
 class AccountDetail extends React.Component {
   static async getInitialProps({ req, query: { id }, res }) {
@@ -62,6 +65,15 @@ class AccountDetail extends React.Component {
             <Container>
               <ContractDetails accountId={account.accountId} />
             </Container>
+
+            <Content
+              size="medium"
+              icon={<KeysIcon style={{ width: "22px" }} />}
+              title={<h2>Access Keys</h2>}
+            >
+              <AccountAccessKeys accountId={account.accountId} />
+            </Content>
+
             <Content
               size="medium"
               icon={<TransactionIcon style={{ width: "22px" }} />}
