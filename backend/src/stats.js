@@ -15,6 +15,8 @@ const {
   queryDepositAmountAggregatedByDate,
   queryPartnerUniqueUserAmount,
   queryGenesisAccountCount,
+  calculateFeesByDay,
+  calculateFeePerDay,
 } = require("./db-utils");
 const {
   formatDate,
@@ -415,6 +417,14 @@ async function getGenesisAccountsCount() {
   return ACCOUNTS_COUNT_IN_GENESIS;
 }
 
+async function getTotalFee(daysCount) {
+  return await calculateFeesByDay(daysCount);
+}
+
+async function getTotalFeePerDays(daysCount) {
+  return await calculateFeePerDay(daysCount);
+}
+
 // aggregate part
 // transaction related
 exports.aggregateTransactionsCountByDate = aggregateTransactionsCountByDate;
@@ -466,3 +476,5 @@ exports.getPartnerFirst3MonthTransactionsCount = getPartnerFirst3MonthTransactio
 exports.getPartnerUniqueUserAmount = getPartnerUniqueUserAmount;
 
 exports.getGenesisAccountsCount = getGenesisAccountsCount;
+exports.getTotalFee = getTotalFee;
+exports.getTotalFeePerDays = getTotalFeePerDays;
